@@ -119,6 +119,13 @@ void UMainGameInstance::OnFindSessionComplete(bool bWasSuccessful)
 		return;
 	}
 
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(
+			-1, 15.f, FColor::Red, FString::Printf(TEXT("%d"), SessionSearch->SearchResults.Num()));
+	}
+
+
 	for (auto Result : SessionSearch->SearchResults)
 	{
 		FString Id = Result.GetSessionIdStr();
@@ -126,6 +133,9 @@ void UMainGameInstance::OnFindSessionComplete(bool bWasSuccessful)
 
 		FString MatchType;
 		Result.Session.SessionSettings.Get(FName("MatchType"), MatchType);
+
+
+		UE_LOG(LogTemp, Warning, TEXT("%s AFEFEFE"), *MatchType);
 
 		if (MatchType == FString("Mission"))
 		{
