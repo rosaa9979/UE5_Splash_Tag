@@ -1,0 +1,9 @@
+.vs
+/Binaries/
+/DerivedDataCache/
+/Intermediate/
+/Saved/
+*.sln
+/Content/StarterContent/*
+/Package/
+/Build/
