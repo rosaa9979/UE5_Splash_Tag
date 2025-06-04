@@ -2,6 +2,9 @@
 #include "OnlineSubsystem.h"
 #include "OnlineSessionSettings.h"
 #include "Online/OnlineSessionNames.h"
+#include "IPAddress.h"
+#include "SocketSubsystem.h"
+#include "Interfaces/OnlineIdentityInterface.h"
 
 UMainGameInstance::UMainGameInstance()
 	: CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete))
@@ -40,6 +43,7 @@ void UMainGameInstance::CreateGameSession()
 	SessionSettings->bAllowJoinViaPresence = true;	//친구	리스트에서 Join?
 	SessionSettings->bShouldAdvertise = true;		//세션 광고
 	SessionSettings->bUseLobbiesIfAvailable = true;	//로비 시스템
+	SessionSettings->bUsesPresence = true;
 	SessionSettings->Set(FName("MatchType"), FString("Mission"), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 	//첫번째 인자는 세션의 유형, 두번째 인자는 게임의 방식
 	//-----------------------------------------------
@@ -88,10 +92,31 @@ void UMainGameInstance::JoinGameSession()
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
 	SessionSearch->MaxSearchResults = 10000;
 	SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+	SessionSearch->bIsLanQuery = false;
 
 	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 	OnlineSessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), SessionSearch.ToSharedRef());
 }
+
+
+//void UMainGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
+//{
+//	if (!OnlineSessionInterface.IsValid())
+//		return;
+//
+//	FString Address;
+//	if (OnlineSessionInterface->GetResolvedConnectString(NAME_GameSession, Address))
+//	{
+//		if (GEngine)
+//			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Yellow, FString::Printf(TEXT("Connect String : %s"), *Address));
+//
+//
+//
+//		APlayerController* PlayerController = GetFirstLocalPlayerController();
+//		if (PlayerController)
+//			PlayerController->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
+//	}
+//}
 
 void UMainGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
 {
@@ -101,6 +126,34 @@ void UMainGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionC
 	FString Address;
 	if (OnlineSessionInterface->GetResolvedConnectString(NAME_GameSession, Address))
 	{
+		// NAT Loopback 우회 코드 시작
+		FString LocalIP;
+		bool bGotLocalIP = false;
+
+		// Get local IP address
+		bool bCanBindAll;
+		TSharedRef<FInternetAddr> LocalAddr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalHostAddr(*GLog, bCanBindAll);
+		if (LocalAddr->IsValid())
+		{
+			LocalIP = LocalAddr->ToString(false); // false = exclude port
+			bGotLocalIP = true;
+		}
+
+		// Extract host IP from resolved address (e.g., 192.168.0.10:7777)
+		FString HostIP, Port;
+		if (Address.Split(":", &HostIP, &Port))
+		{
+			// NAT loopback 우회: 자기 자신에게 접속 시 외부 IP 대신 로컬 IP 사용
+			if (HostIP == IOnlineSubsystem::Get()->GetIdentityInterface()->GetUniquePlayerId(0)->ToString())
+			{
+				if (bGotLocalIP)
+				{
+					Address = FString::Printf(TEXT("%s:%s"), *LocalIP, *Port);
+				}
+			}
+		}
+		// NAT Loopback 우회 코드 끝
+
 		if (GEngine)
 			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Yellow, FString::Printf(TEXT("Connect String : %s"), *Address));
 
@@ -109,6 +162,7 @@ void UMainGameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionC
 			PlayerController->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
 	}
 }
+
 
 void UMainGameInstance::OnFindSessionComplete(bool bWasSuccessful)
 {
@@ -133,9 +187,6 @@ void UMainGameInstance::OnFindSessionComplete(bool bWasSuccessful)
 
 		FString MatchType;
 		Result.Session.SessionSettings.Get(FName("MatchType"), MatchType);
-
-
-		UE_LOG(LogTemp, Warning, TEXT("%s AFEFEFE"), *MatchType);
 
 		if (MatchType == FString("Mission"))
 		{

@@ -9,7 +9,7 @@ public class TeamProject : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "OnlineSubsystem", "OnlineSubsystemSteam",
-			"EnhancedInput"
+			"EnhancedInput", "Sockets"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {});
