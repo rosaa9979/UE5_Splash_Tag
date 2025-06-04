@@ -1,4 +1,4 @@
-#include "MainGameInstance.h"
+#include "Network/MainGameInstance.h"
 #include "OnlineSubsystem.h"
 #include "OnlineSessionSettings.h"
 #include "Online/OnlineSessionNames.h"
