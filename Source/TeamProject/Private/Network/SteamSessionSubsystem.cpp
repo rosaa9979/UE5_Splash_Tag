@@ -186,7 +186,7 @@ void USteamSessionSubsystem::OnFindSessionsComplete(bool bWasSuccessful)
 	}
 
 
-	for (auto Result : SessionSearch->SearchResults)
+	for (auto& Result : SessionSearch->SearchResults)
 	{
 		FString Id = Result.GetSessionIdStr();
 		FString User = Result.Session.OwningUserName;
