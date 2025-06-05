@@ -9,10 +9,10 @@ public class TeamProject : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "OnlineSubsystem", "OnlineSubsystemSteam",
-			"EnhancedInput", "Sockets"
-		});
+			"EnhancedInput", "Sockets", "UMG"
+        });
 
-		PrivateDependencyModuleNames.AddRange(new string[] {});
+		PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 		PublicIncludePaths.AddRange(new string[] { "TeamProject/Public" });
 
 		// Uncomment if you are using Slate UI
