@@ -24,7 +24,7 @@ void UPlayerItemSlot::SetItemName(FText Name)
 	ItemName = Name;
 	Tb_ItemName->SetText(Name);
 
-	FSlateFontInfo FontInfo = Tb_ItemName->Font;
+	FSlateFontInfo FontInfo = Tb_ItemName->GetFont();
 
 	TSharedRef<FSlateFontMeasure> FontMeasure = FSlateApplication::Get().GetRenderer()->GetFontMeasureService();
 	FVector2D MeasuredSize = FontMeasure->Measure(Name, FontInfo);
