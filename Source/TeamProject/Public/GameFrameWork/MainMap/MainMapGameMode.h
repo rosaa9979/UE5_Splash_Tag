@@ -16,6 +16,10 @@ UCLASS()
 class TEAMPROJECT_API AMainMapGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
+
+public:
+	void AddPlayerStartPosition(const FVector & Position) { PlayerStartPositionArr.Add(Position); }
+	void SetBlackBoardViewCamera(class ABlackBoardViewCameraActor * CameraActor) { BlackBoardViewCamera = CameraActor; }
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Game Mode Setting")
@@ -36,4 +40,10 @@ protected:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
 	void AddPlayerToArray(AActor* PlayerState, AController* PlayerController);
+
+private:
+	TArray<FVector> PlayerStartPositionArr; 
+
+	UPROPERTY()
+	class ABlackBoardViewCameraActor * BlackBoardViewCamera;
 };

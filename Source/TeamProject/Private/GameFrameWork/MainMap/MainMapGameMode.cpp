@@ -6,6 +6,8 @@ void AMainMapGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
+	UE_LOG(LogTemp,Warning,TEXT("GameModeBeginPlay"));
+
 	GameState_Ref = Cast<AServerTestGameState>(UGameplayStatics::GetGameState(this));
 }
 
