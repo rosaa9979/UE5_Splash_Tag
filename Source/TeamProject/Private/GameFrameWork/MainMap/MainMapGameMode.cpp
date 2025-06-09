@@ -13,6 +13,8 @@ void AMainMapGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
 
+	UE_LOG(LogTemp,Warning,TEXT("GameModePostLogin"));
+	
 	if (GameControllersArray.Num() < MaxNumOfPlayers)
 	{
 		AActor* NewPlayerState = Cast<AActor>(NewPlayer->PlayerState);
