@@ -10,10 +10,9 @@ void ABlackBoardViewCameraActor::BeginPlay()
 
 	if (HasAuthority())
 	{
-		AMainMapGameMode * MainGameMode = GetWorld()->GetAuthGameMode<AMainMapGameMode>();
-		if (MainGameMode)
+		if (AMainMapGameMode * MainGameMode = GetWorld()->GetAuthGameMode<AMainMapGameMode>())
 		{
-			
+			MainGameMode->SetBlackBoardViewCamera(this);
 		}
 	}
 }

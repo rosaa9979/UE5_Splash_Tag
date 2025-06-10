@@ -29,7 +29,7 @@ private:
 	void InitInput();
 
 private:
-	//ī�޶�
+	//ī�޶�
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FirstViewCamera;
 

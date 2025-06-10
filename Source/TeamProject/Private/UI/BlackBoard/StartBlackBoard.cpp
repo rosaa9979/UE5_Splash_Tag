@@ -3,6 +3,7 @@
 
 #include "UI/BlackBoard/StartBlackBoard.h"
 #include "Components/Button.h"
+#include "GameFrameWork/MainMap/MainMapGameMode.h"
 
 void UStartBlackBoard::NativeConstruct()
 {
@@ -14,7 +15,11 @@ void UStartBlackBoard::NativeConstruct()
 
 void UStartBlackBoard::ClickStartButton()
 {
-	UE_LOG(LogTemp,Warning,TEXT("StartButton"));
-
-	int a = 10;
+	if (GetOwningPlayer() && GetOwningPlayer()->HasAuthority())
+	{
+		if (AMainMapGameMode * GameMode = GetWorld()->GetAuthGameMode<AMainMapGameMode>())
+		{
+			GameMode->GameStart();
+		}
+	}
 }

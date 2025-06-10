@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "Network/ServerTestGameState.h"
 #include "MainMapGameMode.generated.h"
 
 /**
  * 
  */
 
+class AMainMapPlayerState;
+class AMainMapGameState;
 
 UCLASS()
 class TEAMPROJECT_API AMainMapGameMode : public AGameModeBase
@@ -19,18 +20,25 @@ class TEAMPROJECT_API AMainMapGameMode : public AGameModeBase
 
 public:
 	void AddPlayerStartPosition(const FVector & Position) { PlayerStartPositionArr.Add(Position); }
-	void SetBlackBoardViewCamera(class ABlackBoardViewCameraActor * CameraActor) { BlackBoardViewCamera = CameraActor; }
 	
+	void SetBlackBoardViewCamera(class ABlackBoardViewCameraActor * CameraActor) { BlackBoardViewCamera = CameraActor; }
+	class ABlackBoardViewCameraActor * GetBlackBoardViewCamera() const { return BlackBoardViewCamera; }
+
+	void AddTaggerInitLocation(const FVector & Location) { TaggerInitLocationArr.Add(Location); }
+
+	void GameStart();
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Game Mode Setting")
-	int32 MaxNumOfPlayers = 8;
+	int32 MaxNumOfPlayers = 3;
 
+	const int32 TaggerNum = 1; 
+	
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "System")
-	AServerTestGameState* GameState_Ref;
+	UPROPERTY(VisibleAnywhere, Category = "System")
+	AMainMapGameState* MainMapGameState;
 
-	UPROPERTY(EditDefaultsOnly, Category = "System")
-	TArray<AActor*> PlayerStateArray;
+	UPROPERTY(VisibleAnywhere, Category = "System")
+	TArray<AMainMapPlayerState*> MainMapPlayerStateArr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "System")
 	TArray<AController*> GameControllersArray;
@@ -39,11 +47,15 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
-	void AddPlayerToArray(AActor* PlayerState, AController* PlayerController);
-
+	void AddPlayerToArray(AMainMapPlayerState* PlayerState, AController* PlayerController);
+	
 private:
-	TArray<FVector> PlayerStartPositionArr; 
-
+	TArray<FVector> PlayerStartPositionArr;			//플레이어 Start위치 정보 배열 
+	TArray<FVector> TaggerInitLocationArr;			//술래 Start위치 정보 배열
+	
 	UPROPERTY()
 	class ABlackBoardViewCameraActor * BlackBoardViewCamera;
+
+	int GameProgressTime = 77;
+	
 };
