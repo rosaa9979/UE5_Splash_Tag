@@ -32,30 +32,11 @@ void ABaseDoor::Tick(float DeltaTime)
 
 }
 
-void ABaseDoor::HandleProgress(float Value)
-{
-}
-
 void ABaseDoor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
 }
 
 void ABaseDoor::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-}
-
-void ABaseDoor::SetBoxCollisionLocation(const FVector& Loc)
-{
-	BoxCollision->SetWorldLocation(Loc);
-}
-
-void ABaseDoor::SetBoxCollisionRotation(const FRotator& Rot)
-{
-	BoxCollision->SetWorldRotation(Rot);
-}
-
-void ABaseDoor::SetBoxCollisionScale(const FVector& Sca)
-{
-	BoxCollision->SetWorldScale3D(Sca);
 }
 
