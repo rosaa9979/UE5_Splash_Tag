@@ -27,6 +27,8 @@ public:
 	void AddTaggerInitLocation(const FVector & Location) { TaggerInitLocationArr.Add(Location); }
 
 	void GameStart();
+
+	void InitPlayerStartPosition();
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Game Mode Setting")
 	int32 MaxNumOfPlayers = 3;
@@ -56,6 +58,6 @@ private:
 	UPROPERTY()
 	class ABlackBoardViewCameraActor * BlackBoardViewCamera;
 
-	int GameProgressTime = 77;
+	int GameProgressTime = 27;
 	
 };

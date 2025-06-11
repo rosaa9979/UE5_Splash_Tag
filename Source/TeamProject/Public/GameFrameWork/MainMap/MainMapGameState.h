@@ -26,9 +26,12 @@ public:
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 private:
-	void UpdateRemainUI();
+	UFUNCTION()
+	void UpdateSecond();
 	
 private:
 	UPROPERTY(ReplicatedUsing = OnRep_RemainSecond)
 	int RemainSecond;
+
+	FTimerHandle SecondUpdateTimerHandle;
 };

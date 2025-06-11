@@ -17,7 +17,10 @@ void AMainMapPlayerController::BeginPlay()
 
 void AMainMapPlayerController::UpdateRemainTime(int Second)
 {
-	
+	if (PlayerMainHUD)
+	{
+		PlayerMainHUD->UpdateRemainTime(Second);
+	}
 }
 
 void AMainMapPlayerController::InitInputMode()

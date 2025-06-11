@@ -26,6 +26,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ChangeItemSlot();
 
+	void UpdateRemainTime(int Second);
+	
 protected:
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	class UPlayerStateText* W_PlayerStateText;
@@ -41,5 +43,11 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	class UPlayerItemSlot* W_PlayerBagSlot;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	class UTextBlock* Tb_RemainMinute;
+
+	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
+	class UTextBlock* Tb_RemainSecond;
 
 };

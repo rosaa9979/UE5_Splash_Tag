@@ -6,6 +6,14 @@
 
 void AMainMapGameMode::GameStart()
 {
+	if (!MainMapGameState->IsValidLowLevel())
+	{
+		return;
+	}
+	
+	MainMapGameState->SetRemainSecond(GameProgressTime);
+
+	
 	//술래 정하기
 	//----------------------------------------------------
 	TArray<int32> TaggerIndexArr;
@@ -38,15 +46,24 @@ void AMainMapGameMode::GameStart()
 		if (ACharacter * CurCharacter = GameControllersArray[idx]->GetCharacter())
 			CurCharacter->SetActorLocation(SpawnLocation);
 	}
+}
 
-	MainMapGameState->SetRemainSecond(GameProgressTime);
+void AMainMapGameMode::InitPlayerStartPosition()
+{
+	int8 Size = GameControllersArray.Num();
+	for (int8 idx = 0; idx < Size; ++idx)
+	{
+		if (ACharacter * Player = GameControllersArray[idx]->GetCharacter())
+		{
+			Player->SetActorLocation(PlayerStartPositionArr[idx]);
+		}
+	}
+	
 }
 
 void AMainMapGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-
-	UE_LOG(LogTemp,Warning,TEXT("GameModeBeginPlay"));
 
 	MainMapGameState = Cast<AMainMapGameState>(UGameplayStatics::GetGameState(this));
 }
@@ -54,8 +71,6 @@ void AMainMapGameMode::BeginPlay()
 void AMainMapGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
-
-	UE_LOG(LogTemp,Warning,TEXT("GameModePostLogin"));
 	
 	if (GameControllersArray.Num() < MaxNumOfPlayers)
 	{

@@ -3,6 +3,7 @@
 #include "UI/MainHUD/Healthbar.h"
 #include "UI/MainHUD/PlayerStateText.h"
 #include "UI/MainHUD/PlayerItemSlot.h"
+#include "Components/TextBlock.h"
 
 void UPlayerMainHUD::NativeConstruct()
 {
@@ -42,4 +43,16 @@ void UPlayerMainHUD::ChangeItemSlot()
 
 	W_PlayerHandSlot->SetItemName(BagSlotText);
 	W_PlayerBagSlot->SetItemName(HandSlotText);
+}
+
+void UPlayerMainHUD::UpdateRemainTime(int Second)
+{
+	if (Tb_RemainMinute && Tb_RemainSecond)
+	{
+		int RemainMinute = Second / 60;
+		int RemainSecond = Second - RemainMinute * 60;
+
+		Tb_RemainMinute->SetText(FText::AsNumber(RemainMinute));
+		Tb_RemainSecond->SetText(FText::AsNumber(RemainSecond));
+	}
 }
