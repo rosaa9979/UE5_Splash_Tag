@@ -5,33 +5,21 @@
 #include "GameFramework/Character.h"
 #include "Agent.generated.h"
 
+
+class UCameraComponent;
+class USpringArmComponent;
+
 UCLASS()
 class TEAMPROJECT_API AAgent : public ACharacter
 {
 	GENERATED_BODY()
 
-public:
-	AAgent();
+	// Camera
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta =(AllowPrivateAccess = true))
+	USpringArmComponent* CameraBoom;
 
-protected:
-	virtual void BeginPlay() override;
-
-public:	
-	virtual void Tick(float DeltaTime) override;
-
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-public:
-	void Move(const FInputActionValue& Value);
-	void Look(const FInputActionValue& Value);
-
-private:
-	void InitInput();
-
-private:
-	//ī�޶�
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* FirstViewCamera;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta =(AllowPrivateAccess = true))
+	UCameraComponent* FollowCamera;
 
 	//IMC
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -44,6 +32,32 @@ private:
 	//IA_Look
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
+
+	//IA_Jump
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* JumpAction;
+	
+public:
+	AAgent();
+
+protected:
+	virtual void BeginPlay() override;
+
+public:	
+	
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+public:
+	void Move(const FInputActionValue& Value);
+	void Look(const FInputActionValue& Value);
+	
+
+private:
+	void InitInput();
+
+	
+	
+
 
 
 };
