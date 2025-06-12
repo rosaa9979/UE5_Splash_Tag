@@ -20,10 +20,12 @@ AAgent::AAgent()
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_AGENT(TEXT("/Game/Creative_Characters_FREE/Skeleton_Meshes/SK_Body_010.SK_Body_010"));
 	if(SK_AGENT.Succeeded())
 		GetMesh()->SetSkeletalMesh(SK_AGENT.Object);
-	
+
+	// SJS Start
 	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, 90.0f));	
-	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
-	int a = 3;
+	GetMesh()->SetRelativeRotation(FRotator(0.0f, 10.0f, 0.0f));
+	int a = 100;
+	// SJS End
 	
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> DEFAULT_CONTEXT(TEXT("/Game/_GamePlay/Player/Input/IMC_Agent.IMC_Agent"));
 	if (DEFAULT_CONTEXT.Succeeded())
