@@ -21,9 +21,11 @@ AAgent::AAgent()
 	if(SK_AGENT.Succeeded())
 		GetMesh()->SetSkeletalMesh(SK_AGENT.Object);
 	
-	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -80.0f));	
-	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
-	int a = 2;
+	// KJH Start
+	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, 90.0f));	
+	GetMesh()->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
+	int a = 0;
+	// KJH End
 	
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> DEFAULT_CONTEXT(TEXT("/Game/_GamePlay/Player/Input/IMC_Agent.IMC_Agent"));
 	if (DEFAULT_CONTEXT.Succeeded())
