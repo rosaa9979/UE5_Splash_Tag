@@ -1,13 +1,21 @@
 #include "UI/MainHUD/PlayerItemSlot.h"
+
+#include "DDSFile.h"
 #include "Components/TextBlock.h"
 #include "Components/SizeBox.h"
 #include "Fonts/FontMeasure.h"
+#include "Components/Image.h"
+#include "Map/Object/Actor/BaseObject.h"
+#include "UI/MainHUD/WeaponStatusWidget.h"
 
 void UPlayerItemSlot::NativeConstruct()
 {
 	Super::NativeConstruct();
 	
 	ItemName = FText::FromString(TEXT("Empty"));
+
+	if (WeaponStatusWidget)
+		WeaponStatusWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UPlayerItemSlot::SetSlotTypeText(FText SlotTypeText)
@@ -45,6 +53,64 @@ void UPlayerItemSlot::SetItemName(FText Name)
 		return;
 
 	GetWorld()->GetTimerManager().SetTimer(SizeChangeTimerHandle, this, &UPlayerItemSlot::ChangeSize, 0.01f, true);
+}
+
+void UPlayerItemSlot::SetItemInfo(const FItemData& InItemData)
+{
+	if (Img_Item && InItemData.ItemTexture)
+	{
+		FSlateBrush NewBrush;
+		NewBrush.SetResourceObject(InItemData.ItemTexture);
+		NewBrush.TintColor = FSlateColor(FLinearColor(1.f, 1.f, 1.f, 1.0f)); // 알파값 설정
+		Img_Item->SetBrush(NewBrush);
+	}
+
+	if (Tb_ItemName)
+	{
+		SetItemName(FText::FromName(InItemData.ItemName));
+	}
+
+	if (WeaponStatusWidget && InItemData.Item.IsValid())
+	{
+		if (!InItemData.Item->GetDescription().IsEmpty())
+		{
+			WeaponStatusWidget->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
+}
+
+void UPlayerItemSlot::UpdateWeaponStatusUI()
+{
+	if (WeaponStatusWidget)
+		WeaponStatusWidget->UpdateWeaponStatusUI();
+}
+
+void UPlayerItemSlot::ResetSlot()
+{
+	// 이름 초기화
+	ItemName = FText::FromString(TEXT("Empty"));
+	SlotType = FText::FromString(TEXT("Hand"));
+
+	if (Tb_ItemName)
+		Tb_ItemName->SetText(ItemName);
+
+	// 타입 텍스트 초기화
+	if (Tb_SlotTypeText)
+		Tb_SlotTypeText->SetText(SlotType);
+
+	// 이미지 제거
+	if (Img_Item)
+	{
+		FSlateBrush NewBrush;
+		NewBrush.TintColor = FSlateColor(FLinearColor(1.f, 1.f, 1.f, 0.0f)); // 알파값 설정
+		Img_Item->SetBrush(NewBrush);
+	}
+	
+	// 무기 상태 숨김
+	if (WeaponStatusWidget)
+	{
+		WeaponStatusWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
 }
 
 void UPlayerItemSlot::ChangeSize()

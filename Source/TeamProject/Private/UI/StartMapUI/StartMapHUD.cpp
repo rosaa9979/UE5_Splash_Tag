@@ -1,39 +1,65 @@
 #include "UI/StartMapUI/StartMapHUD.h"
 #include "Components/Button.h"
-#include "Network/MainGameInstance.h"
+#include "Kismet/GameplayStatics.h"
+#include "UI/StartMapUI/SessionListBase.h"
+#include "Sound/SoundCue.h"
 
 void UStartMapHUD::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-
-	CreateSessionButton = Cast<UButton>(GetWidgetFromName(TEXT("Btn_CreateSession")));
-	if (CreateSessionButton)
+	if (Btn_GameStart)
+		Btn_GameStart->OnClicked.AddDynamic(this, &UStartMapHUD::ClickGameStartButton);
+	
+	if (WB_SessionListFrame)
 	{
-		CreateSessionButton->OnClicked.AddDynamic(this, &UStartMapHUD::ClickCreateSessionButton);
-	}
+		WB_SessionListFrame->OnFrameExitButtonClicked.BindLambda([this]()
+		{
+			if (DeactiveSessionList)
+				PlayAnimation(DeactiveSessionList);
 
-	JoinSessionButton = Cast<UButton>(GetWidgetFromName(TEXT("Btn_JoinSession")));
-	if (JoinSessionButton)
-	{
-		JoinSessionButton->OnClicked.AddDynamic(this, &UStartMapHUD::ClickJoinSessionButton);
-	}
-}
-
-void UStartMapHUD::ClickCreateSessionButton()
-{
-	UMainGameInstance * MainGameInstance = GetGameInstance<UMainGameInstance>();
-	if (MainGameInstance)
-	{
-		MainGameInstance->CreateGameSession();
+			if (ActiveGameStart)
+				PlayAnimation(ActiveGameStart);
+		});
 	}
 }
 
-void UStartMapHUD::ClickJoinSessionButton()
+void UStartMapHUD::PlayWaterSplashAnimation()
 {
-	UMainGameInstance* MainGameInstance = GetGameInstance<UMainGameInstance>();
-	if (MainGameInstance)
+	if (nullptr != StartWaterSplash)
 	{
-		MainGameInstance->JoinGameSession();
+		PlayAnimation(StartWaterSplash);
 	}
+}
+
+void UStartMapHUD::ClickGameStartButton()
+{	
+	if (nullptr != DeactiveGameStart)
+		PlayAnimation(DeactiveGameStart);
+
+	if (nullptr != ActiveSessionList)
+		PlayAnimation(ActiveSessionList);
+
+	if (ClickUISound)
+		UGameplayStatics::PlaySound2D(this, ClickUISound);
+}
+
+void UStartMapHUD::AddToSessionList(FBlueprintSessionResult SessionResult)
+{
+	if (WB_SessionListFrame)
+	{
+		WB_SessionListFrame->AddSessionList(SessionResult);
+	}
+}
+
+void UStartMapHUD::ClearSessionList()
+{
+	if (WB_SessionListFrame)
+		WB_SessionListFrame->ClearSessionList();
+}
+
+void UStartMapHUD::SetVisibleSessionLoadImage(bool bVisible)
+{
+	if (WB_SessionListFrame)
+		WB_SessionListFrame->SetVisibleSessionLoadImage(bVisible);
 }

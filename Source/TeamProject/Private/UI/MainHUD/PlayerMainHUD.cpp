@@ -1,9 +1,21 @@
 #include "UI/MainHUD/PlayerMainHUD.h"
+
+#include "NiagaraValidationRule.h"
+#include "Components/Image.h"
 #include "UI/MainHUD/SpeedBar.h"
-#include "UI/MainHUD/Healthbar.h"
+#include "UI/MainHUD/StaminaBar.h"
 #include "UI/MainHUD/PlayerStateText.h"
 #include "UI/MainHUD/PlayerItemSlot.h"
 #include "Components/TextBlock.h"
+#include "Field/FieldSystemObjects.h"
+#include "UI/SmartPhone/SmartPhone.h"
+#include "GameFrameWork/MainMap/MainMapPlayerController.h"
+#include "UI/MainHUD/MissionWidget.h"
+#include "Player/Character/BaseCharacter.h"
+#include "Player/Character/AbilitySystem/Attributes/STAttributeSet.h"
+#include "Player/Character/Component/STExtensionComponent.h"
+#include "UI/MainHUD/HealthBar.h"
+#include "UI/ObjectInfo/ObjectInfoPanel.h"
 
 void UPlayerMainHUD::NativeConstruct()
 {
@@ -14,10 +26,10 @@ void UPlayerMainHUD::NativeConstruct()
 		W_PlayerHandSlot->SetSlotTypeText(FText::FromString(TEXT("Hands")));
 	}
 
-	if (W_PlayerBagSlot)
-	{
-		W_PlayerBagSlot->SetSlotTypeText(FText::FromString(TEXT("Bag")));
-	}
+	// if (W_PlayerBagSlot)
+	// {
+	// 	W_PlayerBagSlot->SetSlotTypeText(FText::FromString(TEXT("Bag")));
+	// }
 
 }
 
@@ -27,23 +39,47 @@ void UPlayerMainHUD::SetHandSlotText(FText Text)
 		W_PlayerHandSlot->SetItemName(Text);
 }
 
-void UPlayerMainHUD::SetBagSlotText(FText Text)
+void UPlayerMainHUD::SetHandSlot(const FItemData& InItemData)
 {
-	if (W_PlayerBagSlot)
-		W_PlayerBagSlot->SetItemName(Text);
+	if (W_PlayerHandSlot && InItemData.ItemTexture)
+	{
+		W_PlayerHandSlot->SetItemInfo(InItemData);
+	}
 }
 
-void UPlayerMainHUD::ChangeItemSlot()
+void UPlayerMainHUD::ResetHandSlot()
 {
-	if (nullptr == W_PlayerHandSlot || nullptr == W_PlayerBagSlot)
-		return;
-
-	FText HandSlotText = W_PlayerHandSlot->GetItemName();
-	FText BagSlotText = W_PlayerBagSlot->GetItemName();
-
-	W_PlayerHandSlot->SetItemName(BagSlotText);
-	W_PlayerBagSlot->SetItemName(HandSlotText);
+	if (W_PlayerHandSlot)
+	{
+		W_PlayerHandSlot->ResetSlot();
+	}
 }
+
+void UPlayerMainHUD::UpdateWeaponStatusUI()
+{
+	if (W_PlayerHandSlot)
+	{
+		W_PlayerHandSlot->UpdateWeaponStatusUI();
+	}
+}
+
+// void UPlayerMainHUD::SetBagSlotText(FText Text)
+// {
+// 	if (W_PlayerBagSlot)
+// 		W_PlayerBagSlot->SetItemName(Text);
+// }
+//
+// void UPlayerMainHUD::ChangeItemSlot()
+// {
+// 	if (nullptr == W_PlayerHandSlot || nullptr == W_PlayerBagSlot)
+// 		return;
+//
+// 	FText HandSlotText = W_PlayerHandSlot->GetItemName();
+// 	FText BagSlotText = W_PlayerBagSlot->GetItemName();
+//
+// 	W_PlayerHandSlot->SetItemName(BagSlotText);
+// 	W_PlayerBagSlot->SetItemName(HandSlotText);
+// }
 
 void UPlayerMainHUD::UpdateRemainTime(int Second)
 {
@@ -55,4 +91,194 @@ void UPlayerMainHUD::UpdateRemainTime(int Second)
 		Tb_RemainMinute->SetText(FText::AsNumber(RemainMinute));
 		Tb_RemainSecond->SetText(FText::AsNumber(RemainSecond));
 	}
+}
+
+void UPlayerMainHUD::SetActiveMic(bool Active)
+{
+	if (Active)
+	{
+		Img_MicOn->SetVisibility(ESlateVisibility::Visible);
+		Img_MicOff->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		Img_MicOn->SetVisibility(ESlateVisibility::Hidden);
+		Img_MicOff->SetVisibility(ESlateVisibility::Visible);	
+	}
+}
+
+void UPlayerMainHUD::PlayTalkingAnimation()
+{
+	if (TalkingAnimation)
+		PlayAnimation(TalkingAnimation);
+}
+
+void UPlayerMainHUD::Init() const
+{
+	if (nullptr != W_SmartPhone)
+		W_SmartPhone->InitSmartPhone();
+
+	if (W_ObjectInfoPanel)
+		W_ObjectInfoPanel->InitObjectInfoPanel();
+	
+	if (Tb_PlayerID)
+	{
+		if (AMainMapPlayerController * PlayerController =
+			Cast<AMainMapPlayerController>(GetOwningPlayer()))
+		{
+			Tb_PlayerID->SetText(FText::FromString(PlayerController->GetNickName()));
+		}
+	}
+}
+
+void UPlayerMainHUD::SetGameModeHUD(bool IsMissionMode)
+{
+	if (nullptr == W_MissionWidget)
+		return;
+	
+	if (IsMissionMode)
+	{
+		W_MissionWidget->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		W_MissionWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+void UPlayerMainHUD::AddAllChatSelfMessage(const FChatType & ChatType)
+{
+	if (W_SmartPhone)
+		W_SmartPhone->AddAllChatSelfMessage(ChatType);
+}
+
+void UPlayerMainHUD::AddAllChatOtherMessage(const FChatType & ChatType, const FString& NickName)
+{
+	if (W_SmartPhone)
+		W_SmartPhone->AddAllChatOtherMessage(ChatType,NickName);
+}
+
+void UPlayerMainHUD::AddTeamChatSelfMessage(const FChatType & ChatType)
+{
+	if (W_SmartPhone)
+		W_SmartPhone->AddTeamChatSelfMessage(ChatType);
+}
+
+void UPlayerMainHUD::AddTeamChatOtherMessage(const FChatType & ChatType, const FString& NickName)
+{
+	if (W_SmartPhone)
+		W_SmartPhone->AddTeamChatOtherMessage(ChatType,NickName);
+}
+
+void UPlayerMainHUD::SetPlayerJobText(const FString & JobText)
+{
+	if (Tb_PlayerJob)
+	{
+		Tb_PlayerJob->SetText(FText::FromString(JobText));
+	}
+}
+
+void UPlayerMainHUD::SetPlayerNickName(const FString & NickName)
+{
+	if (Tb_PlayerID)
+	{
+		Tb_PlayerID->SetText(FText::FromString(NickName));
+	}
+}
+
+void UPlayerMainHUD::ClearSmartPhone()
+{
+	if (W_SmartPhone)
+		W_SmartPhone->Clear();
+}
+
+void UPlayerMainHUD::UpdateMissionAboveNumber(int RemainGraffitiCnt)
+{
+	if (W_MissionWidget)
+		W_MissionWidget->UpdateAboveNumber(RemainGraffitiCnt);
+}
+
+void UPlayerMainHUD::UpdateMissionTotalNumber(int TotalGraffitiCnt)
+{
+	if (W_MissionWidget)
+		W_MissionWidget->UpdateTotalNumber(TotalGraffitiCnt);
+}
+
+void UPlayerMainHUD::InitializeHUD(APlayerController* PlayerController)
+{
+		
+	if (APawn* Pawn = PlayerController->GetPawn())
+	{
+		if (ABaseCharacter* Character = Cast<ABaseCharacter>(Pawn))
+		{
+			if (USTExtensionComponent* ExtensionComponent = Character->GetExtensionComponent())
+			{
+				ExtensionComponent->RegisterOnAbilitySystemInitialized(
+					FSimpleDelegate::CreateUObject(this, &UPlayerMainHUD::HandleAbilitySystemInitialized, Character));
+			}
+			
+		}
+	}
+}
+
+void UPlayerMainHUD::OnStaminaChanged(const FOnAttributeChangeData& Data)
+{
+	if (!CachedAttributeSet) return;
+
+	const float MaxStamina = CachedAttributeSet->GetMaxStamina();
+	
+	if (W_StaminaBar)
+	{
+		W_StaminaBar->UpdateStamina(Data.NewValue, MaxStamina);
+	}
+}
+
+void UPlayerMainHUD::OnHealthChanged(const FOnAttributeChangeData& Data)
+{
+	if (!CachedAttributeSet) return;
+
+	const float MaxHealth = CachedAttributeSet->GetMaxHealth();
+
+	if (W_HealthBar)
+	{
+		W_HealthBar->UpdateHealth(Data.NewValue, MaxHealth);
+	}
+}
+
+void UPlayerMainHUD::HandleAbilitySystemInitialized(ABaseCharacter* Character)
+{
+	if (!Character) return;
+	
+	if (UAbilitySystemComponent* ASC = Character->GetAbilitySystemComponent())
+	{
+		if (USTAttributeSet* AttributeSet = Character->GetAttributeSet())
+		{
+			CachedAttributeSet = AttributeSet;
+
+			ASC->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetStaminaAttribute())
+					.AddUObject(this, &UPlayerMainHUD::OnStaminaChanged);
+
+			ASC->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute())
+			.AddUObject(this, &UPlayerMainHUD::OnHealthChanged);
+
+			FOnAttributeChangeData StaminaData;
+			StaminaData.OldValue = AttributeSet->GetStamina();
+			StaminaData.NewValue = AttributeSet->GetStamina();
+			OnStaminaChanged(StaminaData);
+
+			FOnAttributeChangeData HealthData;
+			HealthData.OldValue = AttributeSet->GetHealth();
+			HealthData.NewValue = AttributeSet->GetHealth();
+			OnHealthChanged(HealthData);
+			
+		}
+	}
+}
+
+UObjectInfoPanel* UPlayerMainHUD::GetObjectInfoPanel()
+{
+	if (W_ObjectInfoPanel)
+		return W_ObjectInfoPanel;
+	
+	return nullptr;
 }

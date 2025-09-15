@@ -1,28 +1,29 @@
-#include "UI/MainHUD/Healthbar.h"
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "UI/MainHUD/HealthBar.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 
-void UHealthbar::NativeConstruct()
+void UHealthBar::NativeConstruct()
 {
 	Super::NativeConstruct();
 
 	InitMaterial();
-	InitBarState();	
-	InitHP();
+	InitBarState();
 	InitAnimation();
 }
 
-void UHealthbar::UpdateCurHealth(float NewHealth)
+void UHealthBar::UpdateCurHealth(float NewHealth)
 {
 	CurHealth = NewHealth;
 
 	CurHealth = FMath::Clamp(CurHealth, 0, MaxHealth);
 
-	if (Tb_HealthText)
+	if (HealthText)
 	{
-		Tb_HealthText->SetText(FText::AsNumber(CurHealth));
+		HealthText->SetText(FText::AsNumber(CurHealth));
 	}
-
 
 	float UpdateHealthRate = CurHealth / MaxHealth;
 	if (HealthBarDynMaterial)
@@ -35,16 +36,24 @@ void UHealthbar::UpdateCurHealth(float NewHealth)
 	if (CurHealth >= 0)
 	{
 		IsDecreasing = true; 
-		GetWorld()->GetTimerManager().SetTimer(IncreaseBarFillTimerHandle, this, &UHealthbar::IncreaseBar, 0.01f, true);
+		GetWorld()->GetTimerManager().SetTimer(IncreaseBarFillTimerHandle, this, &UHealthBar::IncreaseBar, 0.01f, true);
 
 		if (CurHealth <= MaxHealth / 2)
 			PlayAnimation(WarningBlinkAnimation);
 		else
 			PlayAnimation(BasicBlinkAnimation);
 	}
+	
+	
 }
 
-void UHealthbar::InitMaterial()
+void UHealthBar::UpdateHealth(float NewHealth, float InMaxHealth)
+{
+	MaxHealth = FMath::Max(InMaxHealth,1);
+	UpdateCurHealth(NewHealth);
+}
+
+void UHealthBar::InitMaterial()
 {
 	UMaterialInstanceDynamic* DynMaterial = Img_HealthBar->GetDynamicMaterial();
 	if (DynMaterial)
@@ -53,7 +62,7 @@ void UHealthbar::InitMaterial()
 	}
 }
 
-void UHealthbar::InitBarState()
+void UHealthBar::InitBarState()
 {
 	if (HealthBarDynMaterial)
 	{
@@ -67,35 +76,27 @@ void UHealthbar::InitBarState()
 		HealthBarDynMaterial->GetVectorParameterValue(TEXT("Inactive_RGBA"), DefaultInactive);
 	}
 
-	if (Tb_HealthText)
+	if (HealthText)
 	{
-		Tb_HealthText->SetText(FText::FromString(TEXT("100")));
+		HealthText->SetText(FText::FromString(TEXT("100")));
 	}
 }
 
-void UHealthbar::InitHP()
+void UHealthBar::InitAnimation()
 {
-	OldHealth = 100;
-	CurHealth = 100;
-	IsDecreasing = false;
-}
-
-void UHealthbar::InitAnimation()
-{
-	BasicBlinkEndDelegate.BindDynamic(this, &UHealthbar::OnBlinkAnimFinished);
-	WarningBlinkEndDelegate.BindDynamic(this, &UHealthbar::OnBlinkAnimFinished);
+	BasicBlinkEndDelegate.BindDynamic(this, &UHealthBar::OnBlinkAnimFinished);
+	WarningBlinkEndDelegate.BindDynamic(this, &UHealthBar::OnBlinkAnimFinished);
 
 	BindToAnimationFinished(BasicBlinkAnimation, BasicBlinkEndDelegate);
 	BindToAnimationFinished(WarningBlinkAnimation, WarningBlinkEndDelegate);
 }
 
-void UHealthbar::IncreaseBar()
+void UHealthBar::IncreaseBar()
 {
-	//°ª Update
-	CurHealth += IncreaseHealthSpeed;
+	//ï¿½ï¿½ Update
 	OldHealth = CurHealth;
 
-	//Áß´Ü Á¶°Ç
+	//ï¿½ß´ï¿½ ï¿½ï¿½ï¿½ï¿½
 	if (CurHealth >= MaxHealth)
 	{
 		CurHealth = MaxHealth;
@@ -104,7 +105,7 @@ void UHealthbar::IncreaseBar()
 		GetWorld()->GetTimerManager().ClearTimer(IncreaseBarFillTimerHandle);
 	}
 
-	//Ã¼·Â¹Ù Update
+	//Ã¼ï¿½Â¹ï¿½ Update
 	float UpdateHealthRate = CurHealth / MaxHealth;
 	if (HealthBarDynMaterial)
 	{
@@ -135,28 +136,27 @@ void UHealthbar::IncreaseBar()
 			HealthBarDynMaterial->SetVectorParameterValue(TEXT("Inactive_RGBA"), Red);
 		}
 	}
-	//Ã¼·Â Text Update
-	if (Tb_HealthText)
-		Tb_HealthText->SetText(FText::AsNumber((int)CurHealth));
-
+	//Ã¼ï¿½ï¿½ Text Update
+	if (HealthText)
+		HealthText->SetText(FText::AsNumber((int)CurHealth));
 }
 
-void UHealthbar::UpdateTextPos()
+void UHealthBar::UpdateTextPos()
 {
-	float CurHealthRate = CurHealth / MaxHealth;
+	float CurStaminaRate = CurHealth / MaxHealth;
 
-	int CurPos = FMath::Lerp(MaxLeftTextPos, 0, CurHealthRate);
+	int CurPos = FMath::Lerp(MaxLeftTextPos, 0, CurStaminaRate);
 	CurPos = FMath::Clamp(CurPos, -275, 0);
 
-	if (Tb_HealthText)
+	if (HealthText)
 	{
 		FWidgetTransform TextTransform;
 		TextTransform.Translation = FVector2D(CurPos, 0);
-		Tb_HealthText->SetRenderTransform(TextTransform);
+		HealthText->SetRenderTransform(TextTransform);
 	}
 }
 
-void UHealthbar::OnBlinkAnimFinished()
+void UHealthBar::OnBlinkAnimFinished()
 {
 	if (CurHealth == MaxHealth)
 		return;
