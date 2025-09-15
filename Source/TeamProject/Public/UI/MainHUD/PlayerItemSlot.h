@@ -2,8 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/Image.h"
+#include "Player/Character/BaseType/BaseStructType.h"
 #include "PlayerItemSlot.generated.h"
 
+class UTexture2D;
 /**
  * 
  */
@@ -19,7 +22,13 @@ public:
 	void SetSlotTypeText(FText SlotTypeText);
 	void SetItemName(FText Name);
 
+	void SetItemInfo(const FItemData& InItemData);
+
 	FText GetItemName() const { return ItemName; }
+
+	void UpdateWeaponStatusUI();
+
+	void ResetSlot();
 private:
 	void ChangeSize();
 
@@ -36,9 +45,16 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class USizeBox* Sb_Frame;
 
-	FText ItemName;
+	UPROPERTY(meta = (BindWidget))
+	class UImage* Img_Item;
 
-	//»çÀÌÁî º¯°æ °ü·Ã º¯¼ö
+	UPROPERTY(meta= (BindWidget))
+	class UWeaponStatusWidget* WeaponStatusWidget;
+
+	FText ItemName;
+	FText SlotType;
+
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	//--------------------------------------
 	const float SizeChangeSpeed = 5.f;
 

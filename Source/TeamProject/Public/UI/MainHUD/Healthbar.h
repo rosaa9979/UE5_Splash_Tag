@@ -1,24 +1,30 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Healthbar.generated.h"
+#include "HealthBar.generated.h"
 
+/**
+ * 
+ */
 UCLASS()
-class TEAMPROJECT_API UHealthbar : public UUserWidget
+class TEAMPROJECT_API UHealthBar : public UUserWidget
 {
 	GENERATED_BODY()
 
-public:
+	public:
 	virtual void NativeConstruct() override;
 
 	UFUNCTION(BlueprintCallable)
-	void UpdateCurHealth(float NewHP);
+	void UpdateCurHealth(float NewHealth);
 
+	void UpdateHealth(float NewHealth, float InMaxHealth);
+	
 private:
 	void InitMaterial();
 	void InitBarState();
-	void InitHP();
 	void InitAnimation();
 
 	void IncreaseBar();
@@ -28,28 +34,27 @@ private:
 	UFUNCTION()
 	void OnBlinkAnimFinished();
 
-private:
-	//UI
-	//--------------------------------
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* Tb_HealthText;
+	
 
+private:
+		
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* HealthText;
+	
 	UPROPERTY(meta = (BindWidget))
 	class UImage* Img_HealthBar;
-	//--------------------------------
-
+	
 	//UI  Material
 	//--------------------------------
 	UPROPERTY(VisibleAnywhere, Category = Material)
 	UMaterialInstanceDynamic* HealthBarDynMaterial;
-	//--------------------------------
-
+	
 	//UI Animation
 	//--------------------------------
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	UWidgetAnimation* BasicBlinkAnimation;
 
-	//½ºÅ³Å°°¡ ´­¸®°í ½ºÅ³ »ç¿ëÀÌ ºÒ°¡´ÉÇÑ °æ¿ì ½ÇÇàµÉ È¿°ú
+	//ï¿½ï¿½Å³Å°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å³ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ò°ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ È¿ï¿½ï¿½
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	UWidgetAnimation* WarningBlinkAnimation;
 
@@ -57,26 +62,24 @@ private:
 	FWidgetAnimationDynamicEvent WarningBlinkEndDelegate;
 	//--------------------------------
 
-	//Ã¼·Â °ü·Ã º¯¼ö
+	//Ã¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	//--------------------------------
 	float OldHealth;
 	float CurHealth;
-
-	const float MaxHealth = 100;
+	float MaxHealth;
+	
+	//Ã¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	//--------------------------------
-
-	//Ã¼·Â ¾÷µ¥ÀÌÆ® °ü·Ã º¯¼ö
-	//--------------------------------
-	FTimerHandle IncreaseBarFillTimerHandle;		//Ã¼·Â È¸º¹ ÀÌÆåÆ® Timer
-	float IncreaseHealthSpeed = 0.08f;				//Ã¼·Â È¸º¹ ¼Óµµ
+	FTimerHandle IncreaseBarFillTimerHandle;		//Ã¼ï¿½ï¿½ È¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® Timer
+	float IncreaseHealthSpeed = 0.08f;				//Ã¼ï¿½ï¿½ È¸ï¿½ï¿½ ï¿½Óµï¿½
 
 	bool IsDecreasing;
 	
-	//Ã¼·Â Text À§Ä¡
+	//Ã¼ï¿½ï¿½ Text ï¿½ï¿½Ä¡
 	const int MaxLeftTextPos = -345;	
 	//--------------------------------
 
-	//Ã¼·Â »ö °ü·Ã º¯¼ö
+	//Ã¼ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	//--------------------------------
 	FLinearColor DefaultActiveOuter;
 	FLinearColor DefaultActive;
@@ -86,3 +89,4 @@ private:
 	//--------------------------------
 	
 };
+
