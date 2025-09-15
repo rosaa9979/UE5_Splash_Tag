@@ -1,0 +1,2 @@
+#include "EffectObjectPool/EfffectObjectPoolInitInfo.h"
+
